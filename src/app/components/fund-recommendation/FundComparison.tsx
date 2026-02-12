@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ArrowRight, TrendingUp, Shield, Zap, Info } from "lucide-react";
 import type { AllFundsResponse } from "@/lib/types";
-import { FUND_CONTENT } from "@/lib/fundContent";
+import { FUND_CONTENT, getDhedgeUrl } from "@/lib/fundContent";
 import { StrategyIntent } from "@/lib/strategyFraming";
 
 interface FundComparisonProps {
@@ -181,7 +181,10 @@ export default function FundComparison({
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">Max Drawdown</span>
                     <span className="font-semibold text-orange-600">
-                      -{content.riskData.historicalMaxDD ?? content.riskData.maxDrawdown}%
+                      -
+                      {content.riskData.historicalMaxDD ??
+                        content.riskData.maxDrawdown}
+                      %
                     </span>
                   </div>
 
@@ -381,7 +384,7 @@ export default function FundComparison({
             )}
 
             <a
-              href={FUND_CONTENT[selectedFund].dhedgeUrl}
+              href={getDhedgeUrl(selectedFund)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"

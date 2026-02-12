@@ -28,7 +28,7 @@ interface RiskData {
 
 interface FundContent {
   name: string;
-  dhedgeUrl: string;
+  address: string;
   matchReason: string;
   launchDate: string;
   targetAPY?: string;
@@ -38,7 +38,7 @@ interface FundContent {
 export const FUND_CONTENT: Record<StrategyIntent, FundContent> = {
   "growth": {
     name: "InflationGuard Leveraged-Growth",
-    dhedgeUrl: "https://dhedge.org/vault/0xba5c9d41415189d01203f471ca501940406bae89", 
+    address: "0xba5c9d41415189d01203f471ca501940406bae89", 
      matchReason: "You have a very long time horizon, high volatility tolerance, and growth-oriented goals. This leveraged strategy maximizes exposure to scarce assets.",
     launchDate: "2024-10-22",
     riskData: {
@@ -80,7 +80,7 @@ export const FUND_CONTENT: Record<StrategyIntent, FundContent> = {
 
   balanced: {
     name: "InflationGuard Balanced",
-    dhedgeUrl: "https://dhedge.org/vault/0x892d59b29fd67ab1c1dbc35d8af03f0465d2c211", 
+    address: "0x892d59b29fd67ab1c1dbc35d8af03f0465d2c211", 
     matchReason:
       "You balance preservation with growth potential and accept moderate volatility. This fund allocates meaningfully to both crypto and precious metals.",
     launchDate: "2026-01-15",
@@ -124,8 +124,7 @@ export const FUND_CONTENT: Record<StrategyIntent, FundContent> = {
 
   conservative: {
     name: "InflationGuard Stable Yield",
-    dhedgeUrl:
-      "https://dhedge.org/manager/0x01d34eb628c40318f906a598b32da8796ec102ed",
+    address: "0x01d34eb628c40318f906a598b32da8796ec102ed",
     matchReason:
       "You prioritize capital stability and consistent yield. This fund uses DeFi strategies to amplify returns on stable assets while minimizing price volatility.",
     launchDate: "2026-01-15",
@@ -181,4 +180,7 @@ export const FUND_CONTENT: Record<StrategyIntent, FundContent> = {
 // Helper function to get fund content by intent
 export function getFundContent(intent: StrategyIntent): FundContent {
   return FUND_CONTENT[intent];
+}
+ export function getDhedgeUrl(intent: StrategyIntent): string {
+  return `https://app.dhedge.org/vault/${FUND_CONTENT[intent].address}`;
 }

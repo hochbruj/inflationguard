@@ -1,19 +1,18 @@
 // components/fund-recommendation/FundHeader.tsx
 
+import { getDhedgeUrl } from "@/lib/fundContent";
 import { StrategyIntent } from "@/lib/strategyFraming";
 import { ExternalLink } from "lucide-react";
 
 interface FundHeaderProps {
   name: string;
   intent: StrategyIntent;
-  dhedgeUrl: string;
   matchReason: string;
 }
 
 export default function FundHeader({
   name,
   intent,
-  dhedgeUrl,
   matchReason,
 }: FundHeaderProps) {
   return (
@@ -37,7 +36,7 @@ export default function FundHeader({
           </div>
         </div>
         <a
-          href={dhedgeUrl}
+          href={getDhedgeUrl(intent)}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"

@@ -1,21 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import FundHeader from "@/components/fund-recommendation/FundHeader";
-import FundStats from "@/components/fund-recommendation/FundStats";
-import PerformanceChart from "@/components/fund-recommendation/PerformanceChart";
-import RiskSummary from "@/components/fund-recommendation/RiskSummary";
-import AssetAllocation from "@/components/fund-recommendation/AssetAllocation";
-import FundComparison from "@/components/fund-recommendation/FundComparison";
+import FundDetailView from "@/components/fund-recommendation/FundDetailView";
 import { useOnboarding } from "../OnboardingContext";
 import { deriveProfile } from "@/lib/profileDerivation";
 import { deriveStrategyFrame, StrategyIntent } from "@/lib/strategyFraming";
-import type { AllFundsResponse } from "@/lib/types";
-import { getFundContent } from "@/lib/fundContent";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSaveOnboarding } from "@/hooks/useSaveOnboarding";
+import { useFundData } from "@/hooks/useFundData";
 import { ArrowRight } from "lucide-react";
 import { FUND_CONTENT } from "@/lib/fundContent";
 
@@ -27,19 +21,25 @@ export default function Step7() {
   const step = 7;
   const totalSteps = 8;
 
-  const [allData, setAllData] = useState<AllFundsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [intent, setIntent] = useState<StrategyIntent | null>(null);
+  const { data: allData, isLoading: loading, error: fetchError } = useFundData();
+  const intent = useMemo(() => {
+    const profile = deriveProfile(answers);
+    return deriveStrategyFrame(profile).intent;
+  }, [answers]);
   const [activeIntent, setActiveIntent] = useState<StrategyIntent | null>(null);
   const [saving, setSaving] = useState(false);
 
   const { saveToFirestore } = useSaveOnboarding();
 
+  // Set activeIntent to AI recommendation on first render
+  if (activeIntent === null && intent) {
+    setActiveIntent(intent);
+  }
+
   const handleContinueToInvest = async () => {
     if (!user) {
       // Redirect to signup if not logged in
-      router.push('/signup');
+      router.push("/signup");
       return;
     }
 
@@ -47,43 +47,18 @@ export default function Step7() {
     try {
       // Save everything to Firestore
       await saveToFirestore(answers, correction, summary, activeIntent!);
-      
+
       // Navigate to Step 8 (Investment Guide)
-      router.push('/onboarding/step8');
+      router.push("/onboarding/step8");
     } catch (err) {
-      console.error('Failed to save:', err);
-      alert('Failed to save your recommendation. Please try again.');
+      console.error("Failed to save:", err);
+      alert("Failed to save your recommendation. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
-  useEffect(() => {
-    // Derive profile and get recommended fund intent
-    const profile = deriveProfile(answers);
-    const strategyFrame = deriveStrategyFrame(profile);
-    setIntent(strategyFrame.intent);
-    setActiveIntent(strategyFrame.intent); // Start with AI recommendation
-
-    // Fetch all fund data from API
-    async function fetchFunds() {
-      try {
-        const response = await fetch("/api/funds");
-        if (!response.ok) {
-          throw new Error("Failed to fetch fund data");
-        }
-        const data: AllFundsResponse = await response.json();
-        setAllData(data);
-      } catch (err) {
-        console.error("Error fetching funds:", err);
-        setError("Failed to load fund data. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchFunds();
-  }, [answers]);
+  const error = fetchError ? "Failed to load fund data. Please try again." : null;
 
   if (loading || !intent) {
     return (
@@ -110,11 +85,6 @@ export default function Step7() {
   }
 
   const currentIntent = activeIntent || intent;
-  const fundApiData = allData.funds[currentIntent!];
-  const fundContent = getFundContent(currentIntent!);
-  const isLaunched = parseFloat(fundApiData.poolValue) > 0;
-  const currentAPY =
-    currentIntent === "conservative" ? fundApiData.returns["1Y"] : undefined;
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-50 px-4 pt-16 pb-12">
@@ -132,56 +102,11 @@ export default function Step7() {
           </p>
         </div>
 
-        <FundHeader
-          name={fundContent.name}
-          intent={currentIntent!}
-          dhedgeUrl={fundContent.dhedgeUrl}
-          matchReason={fundContent.matchReason}
-        />
-
-        <FundStats
-          isLaunched={isLaunched}
-          leverage={
-            currentIntent === "conservative"
-              ? undefined
-              : parseFloat(fundApiData.leverage)
-          }
-          targetAPY={fundContent.targetAPY}
-          currentAPY={currentAPY}
-          returns={fundApiData.returns}
-          intent={currentIntent!}
-        />
-
-        <AssetAllocation
-          composition={fundApiData.composition}
-          intent={currentIntent!}
-          leverage={parseFloat(fundApiData.leverage)}
-        />
-
-        <PerformanceChart
-          intent={currentIntent!}
-          fundLaunchDate={fundContent.launchDate}
-          chartData={{
-            shortTermChartData: allData.shortTermChartData,
-            monthlyChartData: allData.monthlyChartData,
-          }}
-        />
-
-        <RiskSummary
-          intent={currentIntent!}
-          riskData={fundContent.riskData}
-          healthFactor={
-            currentIntent === "conservative"
-              ? parseFloat(fundApiData.healthFactor)
-              : undefined
-          }
-        />
-
-        <FundComparison
-          recommendedIntent={intent!}
-          activeIntent={currentIntent!}
-          allFunds={allData.funds}
-          onFundSwitch={(newIntent) => setActiveIntent(newIntent)}
+        <FundDetailView
+          recommendedIntent={intent}
+          initialActiveIntent={intent}
+          allData={allData}
+          onIntentChange={(newIntent) => setActiveIntent(newIntent)}
         />
 
         {/* Bottom CTA - Save and Continue */}
@@ -201,7 +126,7 @@ export default function Step7() {
               {FUND_CONTENT[intent!].name}). You can switch back above.
             </p>
           )}
-          
+
           {!user && (
             <p className="text-sm text-blue-600 mb-4">
               Create a free account to save your recommendation and continue.
@@ -214,10 +139,10 @@ export default function Step7() {
             className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
-              'Saving...'
+              "Saving..."
             ) : (
               <>
-                {user ? 'Continue to Investment Guide' : 'Sign Up & Continue'}
+                {user ? "Continue to Investment Guide" : "Sign Up & Continue"}
                 <ArrowRight size={20} />
               </>
             )}

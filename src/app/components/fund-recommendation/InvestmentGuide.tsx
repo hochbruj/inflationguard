@@ -4,7 +4,6 @@
 import { useState } from "react";
 import {
   Shield,
-  Download,
   CreditCard,
   ExternalLink,
   ChevronDown,
@@ -16,8 +15,8 @@ import {
   Gift,
   Loader2,
 } from "lucide-react";
-import type { StrategyIntent } from "@/lib/fundContent";
-import { FUND_CONTENT } from "@/lib/fundContent";
+import { StrategyIntent } from "@/lib/strategyFraming";
+import { FUND_CONTENT, getDhedgeUrl } from "@/lib/fundContent";
 
 interface InvestmentGuideProps {
   intent: StrategyIntent;
@@ -548,7 +547,7 @@ export default function InvestmentGuide({ intent }: InvestmentGuideProps) {
                               {/* dHedge CTA (only for invest phase) */}
                               {step.isDhedgeLink && (
                                 <a
-                                  href={fundContent.dhedgeUrl}
+                                  href={getDhedgeUrl(intent)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
