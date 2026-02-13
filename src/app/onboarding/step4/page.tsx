@@ -42,8 +42,6 @@ export default function Step4() {
             key={q.id}
             question={q.question}
             options={q.options}
-            helper={q.helper}
-            type={q.type as any}
             value={answers[q.id]}
             onAnswer={(ans) => handleAnswer(q.id, ans)}
           />

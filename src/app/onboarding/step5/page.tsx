@@ -154,9 +154,9 @@ export default function Step5() {
             className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
             onClick={() => {
               setSummary(
-                lastAssistantMessage?.parts
+                lastAssistantMessage!.parts
                   .map((part) => (part.type === "text" ? part.text : ""))
-                  .join("") || null,
+                  .join(""),
               );
               router.push("/onboarding/step6"); // 👈 Add this
             }}

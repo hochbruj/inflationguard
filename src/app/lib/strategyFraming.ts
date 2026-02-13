@@ -104,9 +104,9 @@ function generateFramingText(
 
   // Paragraph 1: Core approach (driven by INTENT, not motivation)
   if (intent === "conservative") {
-    paragraph1 = `This strategy prioritizes capital resilience over maximum returns. It emphasizes monetary metals (Gold and Silver) as the foundation, with Bitcoin and Ethereum treated as long-term speculation rather than core holdings. The allocation is designed to protect against currency debasement while limiting exposure to high-volatility assets.`;
+    paragraph1 = `This strategy prioritizes capital resilience over maximum returns. It emphasizes monetary metals (Gold) as the foundation, with Bitcoin and Ethereum treated as long-term speculation rather than core holdings. The allocation is designed to protect against currency debasement while limiting exposure to high-volatility assets.`;
   } else if (intent === "balanced") {
-    paragraph1 = `This strategy balances purchasing power preservation with asymmetric growth potential. It allocates meaningfully to both Bitcoin/Ethereum and Gold/Silver, acknowledging that one may underperform while the other protects or appreciates. Neither asset class dominates — the goal is resilience across multiple scenarios.`;
+    paragraph1 = `This strategy balances purchasing power preservation with asymmetric growth potential. It allocates meaningfully to both Bitcoin and Gold, acknowledging that one may underperform while the other protects or appreciates. Neither asset class dominates — the goal is resilience across multiple scenarios.`;
   } else {
     paragraph1 = `This strategy is optimized for long-term capital appreciation through scarce, non-sovereign assets. It emphasizes Bitcoin and Ethereum as primary holdings, with Gold and Silver providing portfolio ballast during crypto drawdowns. The allocation assumes you have conviction in digital scarcity narratives.`;
   }

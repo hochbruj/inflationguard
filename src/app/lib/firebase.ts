@@ -1,7 +1,7 @@
 // lib/firebase.ts
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,5 +17,15 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+export async function saveWalletAddress(walletAddress: string) {
+  const user = auth.currentUser;
+  if (!user) throw new Error('User not authenticated');
+  const userRef = doc(db, 'users', user.uid);
+  await setDoc(userRef, {
+    walletAddress,
+    walletSavedAt: serverTimestamp(),
+  }, { merge: true });
+}
 
 export default app;

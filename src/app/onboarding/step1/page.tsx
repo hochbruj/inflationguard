@@ -44,7 +44,6 @@ export default function Step1() {
             key={q.id}
             question={q.question}
             options={q.options}
-            type={q.type}
             helper={q.helper}
             value={answers[q.id]}
             onAnswer={(ans) => handleAnswer(q.id, ans)}

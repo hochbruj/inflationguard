@@ -19,6 +19,8 @@ export interface UserProfile {
   
   // Onboarding data
   onboardingAnswers?: Record<string, any>;
+  onboardingSummary?: string;
+  onboardingCorrection?: string;
   derivedProfile?: Record<string, any>;
   recommendedIntent?: StrategyIntent;
   activeIntent?: StrategyIntent; // User may switch from recommended
