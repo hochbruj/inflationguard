@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { StrategyIntent } from "@/lib/strategyFraming";
 import { FUND_CONTENT, getDhedgeUrl } from "@/lib/fundContent";
+import { saveWalletAddress } from "@/lib/firebase";
 
 interface InvestmentGuideProps {
   intent: StrategyIntent;
@@ -53,6 +54,7 @@ const PHASES = [
         detail: `Open the app and tap "Create a new wallet". It will show you a 12-word recovery phrase. This is your master key — write it down on paper (not digitally!) and store it somewhere safe like a fireproof box.`,
         warning:
           "Never share your recovery phrase with anyone, not even us. Anyone who has it can access your funds.",
+        isWalletSave: true,
       },
     ],
   },
@@ -152,8 +154,35 @@ const colorClasses = {
   },
 };
 
-// --- Gas Funding Request Sub-component ---
-function GasFundingRequest() {
+// Add these type guard functions inside the component or before it
+function hasWarning(step: any): step is { warning: string } {
+  return "warning" in step;
+}
+
+function hasTip(step: any): step is { tip: string } {
+  return "tip" in step;
+}
+
+function hasGasFunding(step: any): step is { isGasFunding: boolean } {
+  return "isGasFunding" in step;
+}
+
+function hasLinks(
+  step: any,
+): step is { links: { label: string; url: string }[] } {
+  return "links" in step;
+}
+
+function hasDhedgeLink(step: any): step is { isDhedgeLink: boolean } {
+  return "isDhedgeLink" in step;
+}
+
+function hasWalletSave(step: any): step is { isWalletSave: boolean } {
+  return "isWalletSave" in step;
+}
+
+// --- Save Wallet Address Sub-component ---
+function WalletAddressInput() {
   const [walletAddress, setWalletAddress] = useState("");
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
@@ -167,21 +196,11 @@ function GasFundingRequest() {
     setStatus("loading");
 
     try {
-      // TODO: Replace with your actual Firebase endpoint that logs the request
-      // For now this simulates the request — you'll manually send ETH
-      const response = await fetch("/api/request-gas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: walletAddress.trim() }),
-      });
-
-      if (!response.ok) throw new Error("Request failed");
+      await saveWalletAddress(walletAddress.trim());
       setStatus("success");
-    } catch (err) {
+    } catch {
       setStatus("error");
-      setErrorMsg(
-        "Something went wrong. Please try again or buy a small amount of ETH on the exchange.",
-      );
+      setErrorMsg("Something went wrong. Please try again.");
     }
   };
 
@@ -195,11 +214,100 @@ function GasFundingRequest() {
           />
           <div>
             <p className="text-sm font-semibold text-emerald-900">
-              Request sent! 🎉
+              Wallet address saved!
             </p>
             <p className="text-xs text-emerald-700 mt-0.5">
-              We'll send a small amount of ETH to your wallet shortly. Keep an
-              eye on your wallet — it usually arrives within a few minutes.
+              Your wallet address has been saved to your profile.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <p className="text-xs text-blue-700 mb-3">
+        Once you have your wallet address, paste it below to save it to your
+        profile.
+      </p>
+
+      <div className="space-y-2">
+        <input
+          type="text"
+          placeholder="0x..."
+          value={walletAddress}
+          onChange={(e) => {
+            setWalletAddress(e.target.value);
+            setStatus("idle");
+            setErrorMsg("");
+          }}
+          className={`w-full text-sm px-3 py-2 rounded-lg border bg-white font-mono placeholder-gray-400 focus:outline-none focus:ring-2 text-gray-900 ${
+            walletAddress && !isValidAddress
+              ? "border-red-300 focus:ring-red-300"
+              : "border-gray-300 focus:ring-blue-300"
+          }`}
+        />
+
+        {walletAddress && !isValidAddress && (
+          <p className="text-xs text-red-600">
+            That doesn&apos;t look like a valid Ethereum address. It should
+            start with 0x and be 42 characters long.
+          </p>
+        )}
+
+        {status === "error" && (
+          <p className="text-xs text-red-600">{errorMsg}</p>
+        )}
+
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={!isValidAddress || status === "loading"}
+          className={`w-full flex items-center justify-center gap-2 text-sm font-semibold py-2 rounded-lg transition-colors ${
+            isValidAddress && status !== "loading"
+              ? "bg-blue-600 hover:bg-blue-700 text-white"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+          }`}
+        >
+          {status === "loading" ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Wallet Address"
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// --- Gas Funding Request Sub-component (mock for MVP) ---
+function GasFundingRequest() {
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+
+  const handleRequest = () => {
+    setStatus("loading");
+    setTimeout(() => setStatus("success"), 1500);
+  };
+
+  if (status === "success") {
+    return (
+      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+        <div className="flex items-start gap-2">
+          <CheckCircle2
+            size={18}
+            className="text-emerald-600 flex-shrink-0 mt-0.5"
+          />
+          <div>
+            <p className="text-sm font-semibold text-emerald-900">
+              Request sent!
+            </p>
+            <p className="text-xs text-emerald-700 mt-0.5">
+              We&apos;ll send a small amount of ETH to your wallet shortly. Keep
+              an eye on your wallet — it usually arrives within a few minutes.
             </p>
           </div>
         </div>
@@ -216,61 +324,33 @@ function GasFundingRequest() {
         </p>
       </div>
       <p className="text-xs text-purple-700 mb-3">
-        As an early InflationGuard user, we'll cover your initial gas fees.
-        Enter your wallet address below and we'll send you a small amount of ETH
-        (~$5) to get started.
+        As an early InflationGuard user, we&apos;ll cover your initial gas fees.
+        Click below and we&apos;ll send a small amount of ETH (~$5) to the
+        wallet address you saved earlier.
       </p>
 
-      <div className="space-y-2">
-        <input
-          type="text"
-          placeholder="0x..."
-          value={walletAddress}
-          onChange={(e) => {
-            setWalletAddress(e.target.value);
-            setStatus("idle");
-            setErrorMsg("");
-          }}
-          className={`w-full text-sm px-3 py-2 rounded-lg border bg-white font-mono placeholder-gray-400 focus:outline-none focus:ring-2 ${
-            walletAddress && !isValidAddress
-              ? "border-red-300 focus:ring-red-300"
-              : "border-gray-300 focus:ring-purple-300"
-          }`}
-        />
-
-        {walletAddress && !isValidAddress && (
-          <p className="text-xs text-red-600">
-            That doesn't look like a valid Ethereum address. It should start
-            with 0x and be 42 characters long.
-          </p>
+      <button
+        type="button"
+        onClick={handleRequest}
+        disabled={status === "loading"}
+        className={`w-full flex items-center justify-center gap-2 text-sm font-semibold py-2 rounded-lg transition-colors ${
+          status !== "loading"
+            ? "bg-purple-600 hover:bg-purple-700 text-white"
+            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+        }`}
+      >
+        {status === "loading" ? (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            Sending request...
+          </>
+        ) : (
+          <>
+            <Gift size={16} />
+            Request Free ETH
+          </>
         )}
-
-        {status === "error" && (
-          <p className="text-xs text-red-600">{errorMsg}</p>
-        )}
-
-        <button
-          onClick={handleSubmit}
-          disabled={!isValidAddress || status === "loading"}
-          className={`w-full flex items-center justify-center gap-2 text-sm font-semibold py-2 rounded-lg transition-colors ${
-            isValidAddress && status !== "loading"
-              ? "bg-purple-600 hover:bg-purple-700 text-white"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-          }`}
-        >
-          {status === "loading" ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Sending request...
-            </>
-          ) : (
-            <>
-              <Gift size={16} />
-              Request Free ETH
-            </>
-          )}
-        </button>
-      </div>
+      </button>
 
       <p className="text-[10px] text-purple-500 mt-3 text-center">
         One-time offer · Limited to early users · ~$5 ETH value
@@ -340,7 +420,7 @@ export default function InvestmentGuide({ intent }: InvestmentGuideProps) {
         </div>
         {overallPercent === 100 && (
           <p className="text-sm text-emerald-600 font-semibold mt-2 text-center">
-            🎉 You're all set! Welcome to InflationGuard.
+            You&apos;re all set! Welcome to InflationGuard.
           </p>
         )}
       </div>
@@ -499,7 +579,7 @@ export default function InvestmentGuide({ intent }: InvestmentGuideProps) {
                               </p>
 
                               {/* Warning box */}
-                              {step.warning && (
+                              {hasWarning(step) && (
                                 <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3">
                                   <AlertTriangle
                                     size={16}
@@ -511,8 +591,11 @@ export default function InvestmentGuide({ intent }: InvestmentGuideProps) {
                                 </div>
                               )}
 
+                              {/* Save Wallet Address */}
+                              {hasWalletSave(step) && <WalletAddressInput />}
+
                               {/* Tip box */}
-                              {step.tip && (
+                              {hasTip(step) && (
                                 <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
                                   <span className="text-blue-500 flex-shrink-0">
                                     💡
@@ -524,10 +607,10 @@ export default function InvestmentGuide({ intent }: InvestmentGuideProps) {
                               )}
 
                               {/* Gas Funding Request */}
-                              {step.isGasFunding && <GasFundingRequest />}
+                              {hasGasFunding(step) && <GasFundingRequest />}
 
                               {/* Links */}
-                              {step.links && (
+                              {hasLinks(step) && (
                                 <div className="flex flex-wrap gap-2">
                                   {step.links.map((link) => (
                                     <a
@@ -545,7 +628,7 @@ export default function InvestmentGuide({ intent }: InvestmentGuideProps) {
                               )}
 
                               {/* dHedge CTA (only for invest phase) */}
-                              {step.isDhedgeLink && (
+                              {hasDhedgeLink(step) && (
                                 <a
                                   href={getDhedgeUrl(intent)}
                                   target="_blank"

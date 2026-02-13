@@ -111,13 +111,13 @@ export default function PerformanceChart({
           parseDateFlexible(date).toString() === closestLaunchDate?.toString();
 
         // Normalize to starting value of 100
-        const firstValue = sourceData[0][fundKey];
+        const firstValue = sourceData[0][fundKey as keyof typeof sourceData[0]];
         const base = sourceData[0];
-        const fundValue = (item[fundKey] / base[fundKey]) * 100;
+        const fundValue = (item[fundKey] / (base as any)[fundKey]) * 100;
 
         return {
           date: parseDateFlexible(date),
-          fund: ((item[fundKey] / firstValue) * 100).toFixed(2),
+          fund: ((item[fundKey] / +firstValue!) * 100).toFixed(2),
           btc: ((item.BTC / base.BTC) * 100).toFixed(2),
           gold: ((item.AU / base.AU) * 100).toFixed(2),
           balanced50_50: (

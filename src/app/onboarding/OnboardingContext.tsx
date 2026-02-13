@@ -6,15 +6,15 @@ export type Answers = Record<string, string | string[]>;
 
 const OnboardingContext = createContext<{
   answers: Answers;
-  correction: string | null;
-  summary: string | null;
+  correction: string;
+  summary: string;
   setAnswer: (key: string, value: string | string[]) => void;
-  setCorrection: (correction: string | null) => void;
-  setSummary: (summary: string | null) => void;
+  setCorrection: (correction: string) => void;
+  setSummary: (summary: string) => void;
 }>({
   answers: {},
-  correction: null,
-  summary: null,
+  correction: "",
+  summary: "",
   setAnswer: () => {},
   setCorrection: () => {},
   setSummary: () => {},
@@ -31,8 +31,8 @@ export function OnboardingProvider({
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
-  const [correction, setCorrection] = useState<string | null>(null);
-  const [summary, setSummary] = useState<string | null>(null);
+  const [correction, setCorrection] = useState<string>("");
+  const [summary, setSummary] = useState<string>("");
 
   return (
     <OnboardingContext.Provider

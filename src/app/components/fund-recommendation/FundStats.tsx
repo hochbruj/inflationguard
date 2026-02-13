@@ -22,7 +22,7 @@ export default function FundStats({
     return `${sign}${(+value).toFixed(1)}%`;
   };
 
-  const currentAPY = ((1 + parseFloat(returns["1M"]) / 100) ** 12 - 1) * 100;
+  const currentAPY = Math.max(0, (((1 + parseFloat(returns["1M"]) / 100) ** 12 - 1) * 100));
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -53,7 +53,7 @@ export default function FundStats({
                   Current APY
                 </div>
                 <div className="text-xl font-semibold text-green-600">
-                  {currentAPY ? `${currentAPY.toFixed(1)}%` : "~10.5%"}
+                  {`${currentAPY.toFixed(1)}%`}
                 </div>
                 <p className="text-xs text-gray-600 mt-1">
                   Last 30 days annualized
@@ -106,7 +106,7 @@ export default function FundStats({
                 </div>
                 <div
                   className={`text-xl font-semibold ${
-                    returns["5Y"] > 0 ? "text-green-600" : "text-red-600"
+                    +returns["5Y"] > 0 ? "text-green-600" : "text-red-600"
                   }`}
                 >
                   {formatPercent(returns["5Y"])}

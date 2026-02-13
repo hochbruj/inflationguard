@@ -48,7 +48,7 @@ export default function Holdings({ totalValue, activeIntent }: HoldingsProps) {
       </h3>
       <div className="space-y-2">
         {composition.map((asset, idx) => {
-          const assetValue = (totalValue * asset.allocation) / 100;
+          const assetValue = (totalValue * +asset.allocation) / 100;
           const effectiveExposure = isLeveraged ? assetValue * +leverage : null;
           
           return (
