@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## What is InflationGuard?
+
+InflationGuard is a retail investor platform that helps users protect their wealth against inflation by recommending an appropriate dHedge on-chain fund based on their risk profile. The app guides users through a short questionnaire, generates an AI-powered reflection on their answers, derives a risk profile, and then recommends one of three proprietary dHedge vaults (conservative/balanced/growth). Users can then view live fund data and invest directly via dHedge.
+
+The core thesis: traditional savings erode under inflation. InflationGuard steers users toward scarce, non-sovereign assets (Bitcoin, Gold, Ethereum) packaged as managed on-chain funds.
+
 ## Commands
 
 ```bash
@@ -50,7 +56,35 @@ Fund data comes from two hardcoded Google Cloud Functions:
 
 ### Strategy determination logic
 
-Profile derivation applies safety adjustments (e.g., high capital criticality caps volatility tolerance). Strategy framing is constraint-driven: any hard constraint → conservative, all growth conditions met → growth, else → balanced. See `profileDerivation.ts` and `strategyFraming.ts`.
+Profile derivation applies safety adjustments (e.g., high capital criticality caps volatility tolerance). Strategy framing is constraint-driven: **any hard constraint → conservative**, all growth conditions met → growth, else → balanced. See `profileDerivation.ts` and `strategyFraming.ts`.
+
+Hard constraints that force conservative: `capitalCriticality === "high"`, `volatilityTolerance === "low"`, `timeHorizon === "short"`, `liquidityNeed === "high"`.
+
+## Onboarding questionnaire (4 blocks → 10 questions)
+
+- **Block 1 — Capital & time horizon** (q1.1–q1.6): When they need the capital, liquidity needs, emotional safety, impact of 50% permanent loss, ability to rebuild.
+- **Block 2 — Volatility tolerance** (q2.1–q2.3): Reaction to 30% drawdown, experience holding through crashes, fear of loss vs. fear of missing out.
+- **Block 3 — Asset familiarity** (q3.1–q3.3): Bitcoin/Ethereum knowledge level, view of Gold/Silver, preference for simplicity vs. optimization.
+- **Block 4 — Goals** (q4.2): Primary goal (growth / preserve purchasing power / balanced).
+
+Questions are defined in `src/app/data/questions.ts`. The AI reflection (step 5) uses these answers to generate a personalized narrative before profile derivation.
+
+## dHedge funds
+
+All three are proprietary vaults managed on dHedge. Fund metadata (name, address, risk data, launch date) lives in `src/app/lib/fundContent.ts`. Live performance/allocation data is fetched at runtime from external GCF endpoints.
+
+| Strategy | Fund name | Vault address | Max drawdown | Key assets |
+|---|---|---|---|---|
+| **Conservative** | InflationGuard Stable Yield | `0x01d34eb628c40318f906a598b32da8796ec102ed` | ~30% (theoretical); ~10% historical | sUSDe (Ethena) leveraged on Aave, small BTC position. Target 10–15% APY. |
+| **Balanced** | InflationGuard Balanced | `0x892d59b29fd67ab1c1dbc35d8af03f0465d2c211` | ~41% | ~35% BTC, Gold allocation, stablecoin yield via Aave |
+| **Growth** | InflationGuard Leveraged-Growth | `0xba5c9d41415189d01203f471ca501940406bae89` | ~72% | Bitcoin + Ethereum with 1.5× leverage via Aave |
+
+All vaults are accessible on dHedge at `https://app.dhedge.org/vault/<address>`. The helper `getDhedgeUrl(intent)` in `fundContent.ts` builds this URL.
+
+Key risks by tier:
+- **Conservative**: USDe de-peg, health factor close to liquidation (1.18), Ethena/Aave smart contract risk.
+- **Balanced**: BTC volatility dampened by gold; gold may drag during crypto bull runs.
+- **Growth**: 70–80% BTC drawdowns amplified by leverage; liquidation risk during flash crashes.
 
 ## Environment variables
 

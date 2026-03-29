@@ -40,7 +40,7 @@ export const FUND_CONTENT: Record<StrategyIntent, FundContent> = {
     name: "InflationGuard Leveraged-Growth",
     address: "0xba5c9d41415189d01203f471ca501940406bae89", 
      matchReason: "You have a very long time horizon, high volatility tolerance, and growth-oriented goals. This leveraged strategy maximizes exposure to scarce assets.",
-    launchDate: "2024-10-22",
+    launchDate: "2025-10-22",
     riskData: {
       maxDrawdown: 72,
       drawdownLabel: "Severe drawdowns expected during crypto bear markets",
