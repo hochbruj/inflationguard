@@ -75,14 +75,14 @@ All three are proprietary vaults managed on dHedge. Fund metadata (name, address
 
 | Strategy | Fund name | Vault address | Max drawdown | Key assets |
 |---|---|---|---|---|
-| **Conservative** | InflationGuard Stable Yield | `0x01d34eb628c40318f906a598b32da8796ec102ed` | ~30% (theoretical); ~10% historical | sUSDe (Ethena) leveraged on Aave, small BTC position. Target 10–15% APY. |
+| **Conservative** | InflationGuard Stable Yield | `0x01d34eb628c40318f906a598b32da8796ec102ed` | ~10% (theoretical); ~5% historical | USDT deposited on Aave (~5% APY), small BTC position. Target 5–10% APY. |
 | **Balanced** | InflationGuard Balanced | `0x892d59b29fd67ab1c1dbc35d8af03f0465d2c211` | ~41% | ~35% BTC, Gold allocation, stablecoin yield via Aave |
 | **Growth** | InflationGuard Leveraged-Growth | `0xba5c9d41415189d01203f471ca501940406bae89` | ~72% | Bitcoin + Ethereum with 1.5× leverage via Aave |
 
 All vaults are accessible on dHedge at `https://app.dhedge.org/vault/<address>`. The helper `getDhedgeUrl(intent)` in `fundContent.ts` builds this URL.
 
 Key risks by tier:
-- **Conservative**: USDe de-peg, health factor close to liquidation (1.18), Ethena/Aave smart contract risk.
+- **Conservative**: USDT de-peg, Tether counterparty/regulatory risk, Aave smart contract risk, yield compression.
 - **Balanced**: BTC volatility dampened by gold; gold may drag during crypto bull runs.
 - **Growth**: 70–80% BTC drawdowns amplified by leverage; liquidation risk during flash crashes.
 
