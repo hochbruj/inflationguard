@@ -128,50 +128,50 @@ export const FUND_CONTENT: Record<StrategyIntent, FundContent> = {
     matchReason:
       "You prioritize capital stability and consistent yield. This fund uses DeFi strategies to amplify returns on stable assets while minimizing price volatility.",
     launchDate: "2026-01-15",
-    targetAPY: "10-15%",
+    targetAPY: "5-10%",
     riskData: {
-      maxDrawdown: 30,
+      maxDrawdown: 10,
       drawdownLabel:
-        "Severe stablecoin de-peg with leveraged position liquidation (theoretical worst-case)",
-      historicalMaxDD: 10,
+        "USDT de-peg or Aave smart contract exploit (theoretical worst-case)",
+      historicalMaxDD: 5,
       historicalDDLabel: "Worst observed decline in 2018-2025 backtest",
       historicalEvents: [
-        { event: "2022 Crypto Crash", year: "2022", impact: -8 },
-        { event: "COVID-19 Crash", year: "Mar 2020", impact: -5 },
-        { event: "2018 Bear Market", year: "2018", impact: -8 },
+        { event: "2022 Crypto Crash", year: "2022", impact: -3 },
+        { event: "COVID-19 Crash", year: "Mar 2020", impact: -2 },
+        { event: "2018 Bear Market", year: "2018", impact: -3 },
       ],
       keyRisks: [
         {
-          title: "USDe De-peg Risk",
+          title: "USDT De-peg Risk",
           description:
-            "Ethena's USDe is a synthetic dollar. If it loses its $1 peg significantly, the leveraged position could be liquidated.",
-          severity: "high",
+            "Tether's USDT could lose its $1 peg if reserves are insufficient or regulators restrict operations. A significant de-peg would directly reduce the value of this core position.",
+          severity: "medium",
         },
         {
-          title: "Health Factor Risk",
+          title: "Tether Counterparty Risk",
           description:
-            "Current health factor of 1.18 is close to liquidation threshold (1.0). Requires active monitoring and potential deleveraging.",
-          severity: "high",
+            "USDT is issued by Tether Ltd. Regulatory action, reserve shortfalls, or insolvency at Tether could impair the value of USDT holdings.",
+          severity: "medium",
         },
         {
-          title: "Smart Contract Risk",
+          title: "Aave Smart Contract Risk",
           description:
-            "Exposure to Ethena (newer protocol) and Aave. While audited, exploits could result in total loss of leveraged position.",
+            "Funds deposited on Aave are exposed to smart contract vulnerabilities. While Aave is battle-tested and audited, exploits could result in partial or total loss.",
           severity: "medium",
         },
         {
           title: "Yield Compression Risk",
           description:
-            "If USDe-USDT yield spread narrows or borrowing costs spike, returns could drop below target 10% APY.",
+            "Aave supply rates can compress significantly during periods of low borrowing demand, reducing returns below the current ~5% APY.",
           severity: "low",
         },
       ],
       worstCaseScenarios: [
-        "USDe de-pegs to $0.85 → Leveraged position liquidated, 20-30% capital loss on stable portion",
-        "Ethena protocol exploit → Total loss of sUSDe position (65% of portfolio)",
-        "Health factor drops below 1.0 → Forced liquidation with slippage losses",
-        "Yield spread collapses → Returns drop to 3-5% APY instead of 10%+",
-        "Bitcoin crashes 70% simultaneously → Small BTC position (10%) contributes -7% to portfolio",
+        "USDT de-pegs to $0.90 → ~10% loss on the stablecoin position",
+        "Tether regulatory action → USDT redemptions halted, liquidity crisis",
+        "Aave exploit → Partial or total loss of deposited USDT",
+        "DeFi borrowing demand collapses → Aave yields drop to 1-2% APY",
+        "Bitcoin crashes 70% simultaneously → Small BTC position contributes further loss",
       ],
     },
   },

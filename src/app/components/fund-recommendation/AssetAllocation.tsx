@@ -9,7 +9,6 @@ import {
 import { StrategyIntent } from "@/lib/strategyFraming";
 import { AssetComposition } from "@/lib/types";
 
-
 interface AssetAllocationProps {
   composition: AssetComposition[];
   intent: StrategyIntent;
@@ -31,7 +30,8 @@ const TOKEN_ICONS: Record<string, string> = {
   XAUT: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x68749665FF8D2d112Fa859AA293F07A622782F38/logo.png",
   sUSDe:
     "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9D39A5DE30e57443BfF2A8307A4256c8797A3497/logo.png",
-    USDC: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
+  USDC: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
+  USDT: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
 };
 
 export default function AssetAllocation({
@@ -69,9 +69,7 @@ export default function AssetAllocation({
                     <span className="text-lg font-semibold text-gray-900 block">
                       {asset.symbol}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {asset.asset}
-                    </span>
+                    <span className="text-sm text-gray-500">{asset.asset}</span>
                   </div>
                 </div>
                 <span className="text-lg font-semibold text-gray-900">

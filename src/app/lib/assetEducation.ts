@@ -23,8 +23,13 @@ export function getAssetExplanation(
       conservative: `Yield stablecoins are a core stability holding at ${allocation}% allocation, earning ~10% APY through Aave lending. This provides consistent, predictable returns appropriate for your low volatility tolerance and capital preservation goals. The yield comes from lending to overcollateralized borrowers, not price appreciation.`,
     },
     sUSDe: {
-      conservative: `This position uses Ethena's sUSDe (staked USDe earning 6% base yield) with a leveraged borrowing strategy to amplify returns to 10%+ APY. At ${allocation}% allocation, this is the core yield engine of the fund. Unlike leveraging Bitcoin (which amplifies price volatility), this strategy leverages stablecoins to amplify yield while maintaining price stability near $1.`,
-      balanced: `Yield-optimized stablecoins provide enhanced income at ${allocation}% allocation through Ethena's sUSDe protocol combined with strategic borrowing. This generates higher yield than simple USDC lending while maintaining stablecoin price characteristics.`,
+      conservative: `USDe is deposited on Aave earning approximately 4% APY. At ${allocation}% allocation, this is a core stable yield position in the fund. Unlike volatile crypto assets, USDe maintains price stability near $1 while generating consistent income through Aave's lending markets.`,
+      balanced: `USDe on Aave provides stable yield at approximately 4% APY, contributing consistent income at ${allocation}% allocation. This position maintains stablecoin price characteristics while generating returns through Aave's lending markets.`,
+      growth: `Not typically used in growth-oriented funds as the focus is on capital appreciation rather than yield generation.`,
+    },
+    USDT: {
+      conservative: `USDT is deposited on Aave earning approximately 5% APY. At ${allocation}% allocation, this is a core stable yield position in the fund. As the most widely-used stablecoin, USDT provides reliable liquidity while generating consistent income through Aave's lending markets.`,
+      balanced: `USDT on Aave provides stable yield at approximately 5% APY, contributing consistent income at ${allocation}% allocation. This position maintains price stability near $1 while generating returns through Aave's deep lending markets.`,
       growth: `Not typically used in growth-oriented funds as the focus is on capital appreciation rather than yield generation.`,
     },
   };
@@ -38,7 +43,9 @@ export function getAssetRisks(asset: string, intent: string): string {
     XAUT: "Tether custody risk, potential stablecoin-like regulation, lower returns than BTC in bull markets",
     USDC: "Circle/USDC de-peg risk (historical max: -7%), Aave smart contract vulnerabilities, regulatory stablecoin restrictions",
     sUSDe:
-      "USDe de-peg risk (synthetic dollar backed by derivatives), Ethena protocol risk, Aave smart contract risk, tight health factor (1.18) requires active monitoring",
+      "USDe de-peg risk (synthetic dollar backed by derivatives), Ethena protocol risk, Aave smart contract risk",
+    USDT:
+      "Tether counterparty/reserve risk, regulatory uncertainty around USDT issuance, Aave smart contract risk",
   };
   return risks[asset] || "Risk assessment pending.";
 }
@@ -49,7 +56,9 @@ export function getAssetUnderperformance(asset: string): string {
     XAUT: "During crypto bull markets and risk-on environments when investors chase higher-beta assets",
     USDC: "During crypto bull markets (opportunity cost vs BTC/ETH gains), or if TradFi rates exceed DeFi yields",
     sUSDe:
-      "If USDe-USDT yield spread compresses, if borrowing costs spike above 6%, or if Ethena rewards decrease",
+      "If Aave supply rates compress significantly, or if USDe de-pegs and confidence erodes",
+    USDT:
+      "If Aave supply rates compress significantly, or during periods of low DeFi borrowing demand",
   };
   return underperformance[asset] || "Underperformance scenarios pending.";
 }
@@ -60,6 +69,8 @@ export function getAssetExpectations(asset: string): string {
     XAUT: "High returns or explosive gains—gold preserves purchasing power but rarely appreciates dramatically",
     USDC: "Capital appreciation—this is yield generation only, not a growth asset",
     sUSDe:
+      "Capital appreciation—this is yield generation only, not a growth asset",
+    USDT:
       "Capital appreciation—this is yield generation only, not a growth asset",
   };
   return expectations[asset] || "Expectations guidance pending.";
